@@ -58,8 +58,8 @@ const recentTransactions = [
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
+                <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                     <Calendar class="h-4 w-4" />
                     <span>7/17/2025</span>
                 </div>
@@ -72,15 +72,15 @@ const recentTransactions = [
                 <div
                     v-for="stat in stats"
                     :key="stat.name"
-                    class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md dark:hover:shadow-lg transition-shadow"
                 >
                     <div class="flex items-center">
-                        <div class="flex-shrink-0 p-3 bg-gray-50 rounded-lg">
-                            <component :is="stat.icon" class="h-6 w-6 text-gray-600" />
+                        <div class="flex-shrink-0 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <component :is="stat.icon" class="h-6 w-6 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div class="ml-4 flex-1">
-                            <p class="text-sm font-medium text-gray-600">{{ stat.name }}</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ stat.value }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ stat.name }}</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
                         </div>
                         <div class="flex items-center">
                             <TrendingUp v-if="stat.changeType === 'increase'" class="h-4 w-4 text-green-500 mr-1" />
@@ -102,59 +102,59 @@ const recentTransactions = [
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Recent Transactions -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-semibold text-gray-900">Recent Transactions</h3>
-                                <button class="text-sm text-gray-500 hover:text-gray-700 font-medium">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
+                                <button class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium">
                                     View all
                                 </button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-750">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Customer
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Amount
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Time
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Status
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="transaction in recentTransactions" :key="transaction.id" class="hover:bg-gray-50">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr v-for="transaction in recentTransactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
                                             {{ transaction.customer }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
                                             {{ transaction.amount }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
                                             {{ transaction.time }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="[
-                                                transaction.status === 'completed'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-yellow-100 text-yellow-800',
-                                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full'
-                                            ]">
-                                                {{ transaction.status }}
-                                            </span>
+                                        <span :class="[
+                                            transaction.status === 'completed'
+                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+                                            'inline-flex px-2 py-1 text-xs font-semibold rounded-full'
+                                        ]">
+                                            {{ transaction.status }}
+                                        </span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -166,25 +166,25 @@ const recentTransactions = [
                 <!-- Right Sidebar -->
                 <div class="space-y-6">
                     <!-- Quick Actions -->
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                             <div class="flex items-center">
-                                <Activity class="h-5 w-5 text-gray-600 mr-2" />
-                                <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                                <Activity class="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
                             </div>
                         </div>
                         <div class="p-6">
                             <div class="space-y-3">
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
+                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
                                     New Sale
                                 </button>
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                                     Add Product
                                 </button>
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                                     View Reports
                                 </button>
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                                     Manage Inventory
                                 </button>
                             </div>
@@ -192,26 +192,26 @@ const recentTransactions = [
                     </div>
 
                     <!-- System Status -->
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                             <div class="flex items-center">
-                                <Clock class="h-5 w-5 text-gray-600 mr-2" />
-                                <h3 class="text-lg font-semibold text-gray-900">System Status</h3>
+                                <Clock class="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">System Status</h3>
                             </div>
                         </div>
                         <div class="p-6">
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Database</span>
-                                    <span class="text-sm font-medium text-green-600">Online</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Database</span>
+                                    <span class="text-sm font-medium text-green-600 dark:text-green-400">Online</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Payment Gateway</span>
-                                    <span class="text-sm font-medium text-green-600">Active</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Payment Gateway</span>
+                                    <span class="text-sm font-medium text-green-600 dark:text-green-400">Active</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Inventory Sync</span>
-                                    <span class="text-sm font-medium text-green-600">Updated</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Inventory Sync</span>
+                                    <span class="text-sm font-medium text-green-600 dark:text-green-400">Updated</span>
                                 </div>
                             </div>
                         </div>

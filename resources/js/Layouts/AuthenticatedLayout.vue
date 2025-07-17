@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { useMenuManager } from '@/composables/useMenuManager';
+import { useDarkMode } from '@/composables/useDarkMode';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -28,8 +29,6 @@ import {
     Shield,
     Database,
     TrendingUp,
-    Calendar,
-    MessageSquare,
     Archive,
     Truck,
     DollarSign,
@@ -37,7 +36,12 @@ import {
     UserCheck,
     Store,
     Layers,
-    Globe
+    Globe,
+    Plus,
+    HelpCircle,
+    Moon,
+    Sun,
+    Monitor
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -49,20 +53,22 @@ const {
     setActiveMenuItem
 } = useMenuManager();
 
+const { isDarkMode, toggleDarkMode } = useDarkMode();
+
 const sidebarOpen = ref(false);
 const sidebarExpanded = ref(true);
 const isMobile = ref(false);
 
 // Get app name from environment or use default
 const appName = computed(() => {
-    return page.props.appName || import.meta.env.VITE_APP_NAME || 'POS System';
+    return page.props.appName || import.meta.env.VITE_APP_NAME || 'Business Suite';
 });
 
 // Check if we're on mobile
 const checkMobile = () => {
     isMobile.value = window.innerWidth < 1024;
-    if (isMobile.value) {
-        sidebarOpen.value = false;
+    if (isMobile.value && sidebarExpanded.value) {
+        sidebarExpanded.value = false;
     }
 };
 
@@ -81,7 +87,7 @@ watch(() => page.url, () => {
     updateActiveMenuItems();
 });
 
-// Navigation items with nested structure
+// Enterprise-grade navigation structure
 const navigation = ref([
     {
         id: 'dashboard',
@@ -103,7 +109,7 @@ const navigation = ref([
                 name: 'POS Terminal',
                 route: 'sales.pos',
                 icon: Store,
-                exists: true, // Set to true since we'll create this route
+                exists: true,
                 active: false
             },
             {
@@ -111,7 +117,7 @@ const navigation = ref([
                 name: 'Orders',
                 route: 'sales.orders',
                 icon: Receipt,
-                exists: true, // Set to true since we'll create this route
+                exists: true,
                 active: false,
                 badge: '12'
             },
@@ -120,7 +126,7 @@ const navigation = ref([
                 name: 'Invoices',
                 route: 'sales.invoices',
                 icon: FileText,
-                exists: true, // Set to true since we'll create this route
+                exists: true,
                 active: false
             }
         ]
@@ -193,7 +199,7 @@ const navigation = ref([
     },
     {
         id: 'reports',
-        name: 'Reports & Analytics',
+        name: 'Analytics',
         icon: BarChart3,
         exists: true,
         active: false,
@@ -241,7 +247,7 @@ const navigation = ref([
         children: [
             {
                 id: 'settings-general',
-                name: 'General Settings',
+                name: 'General',
                 route: 'settings.general',
                 icon: Settings,
                 exists: true,
@@ -257,7 +263,7 @@ const navigation = ref([
             },
             {
                 id: 'settings-system',
-                name: 'System Settings',
+                name: 'System',
                 route: 'settings.system',
                 icon: Globe,
                 exists: true,
@@ -295,7 +301,6 @@ const toggleSidebar = () => {
         sidebarOpen.value = !sidebarOpen.value;
     } else {
         sidebarExpanded.value = !sidebarExpanded.value;
-        // Close all submenus when collapsing
         if (!sidebarExpanded.value) {
             closeAllSubmenus();
             updateActiveMenuItems();
@@ -313,20 +318,29 @@ const closeSidebar = () => {
 const filteredNavigation = computed(() => {
     return navigation.value.filter(item => item.exists || item.children);
 });
+
+// Theme icon computed property
+const themeIcon = computed(() => {
+    return isDarkMode.value ? Sun : Moon;
+});
+
+const themeText = computed(() => {
+    return isDarkMode.value ? 'Light Mode' : 'Dark Mode';
+});
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <!-- Mobile sidebar overlay -->
         <div
             v-if="isMobile && sidebarOpen"
-            class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 transition-opacity"
+            class="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity"
             @click="closeSidebar"
         ></div>
 
         <!-- Sidebar -->
         <div
-            class="fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-lg"
+            class="fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out shadow-sm"
             :class="[
                 isMobile
                     ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') + ' w-64'
@@ -334,42 +348,39 @@ const filteredNavigation = computed(() => {
             ]"
         >
             <div class="flex flex-col h-full">
-                <!-- Header -->
-                <div class="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-                    <Link :href="route('dashboard')" class="flex items-center space-x-2">
-                        <ApplicationLogo class="h-8 w-8 text-gray-600 flex-shrink-0" />
-                        <span
+                <!-- Logo Header -->
+                <div class="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <Link :href="route('dashboard')" class="flex items-center space-x-3">
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-lg flex items-center justify-center">
+                            <ApplicationLogo class="h-5 w-5 text-white" />
+                        </div>
+                        <div
                             v-if="sidebarExpanded || isMobile"
-                            class="text-xl font-semibold text-gray-900 whitespace-nowrap"
+                            class="flex flex-col"
                         >
-                            {{ appName }}
-                        </span>
+                            <span class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ appName }}
+                            </span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                Enterprise Edition
+                            </span>
+                        </div>
                     </Link>
 
-                    <!-- Desktop toggle -->
+                    <!-- Collapse toggle for desktop -->
                     <button
                         v-if="!isMobile"
                         @click="toggleSidebar"
-                        class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
-                        :title="sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
+                        class="p-1.5 rounded-lg text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
-                        <ChevronLeft v-if="sidebarExpanded" class="h-5 w-5" />
-                        <ChevronRight v-else class="h-5 w-5" />
-                    </button>
-
-                    <!-- Mobile close -->
-                    <button
-                        v-if="isMobile"
-                        @click="closeSidebar"
-                        class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
-                    >
-                        <X class="h-6 w-6" />
+                        <ChevronLeft v-if="sidebarExpanded" class="h-4 w-4" />
+                        <ChevronRight v-else class="h-4 w-4" />
                     </button>
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 overflow-y-auto">
-                    <ul class="space-y-2">
+                <nav class="flex-1 px-3 py-4 overflow-y-auto">
+                    <ul class="space-y-1">
                         <SidebarMenuItem
                             v-for="item in filteredNavigation"
                             :key="item.id"
@@ -382,48 +393,25 @@ const filteredNavigation = computed(() => {
                     </ul>
                 </nav>
 
-                <!-- User section -->
-                <div class="p-4 border-t border-gray-200">
-                    <div class="relative">
-                        <Dropdown align="right" width="56">
-                            <template #trigger>
-                                <button
-                                    :class="[
-                                        'flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors',
-                                        !(sidebarExpanded || isMobile) && 'justify-center'
-                                    ]"
-                                >
-                                    <div class="flex items-center space-x-3 flex-1">
-                                        <div class="flex-shrink-0 h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
-                                            <User class="h-4 w-4 text-gray-500" />
-                                        </div>
-                                        <div v-if="sidebarExpanded || isMobile" class="text-left min-w-0 flex-1">
-                                            <p class="text-sm font-medium text-gray-900 truncate">{{ $page.props.auth.user.name }}</p>
-                                            <p class="text-xs text-gray-500 truncate">{{ $page.props.auth.user.email }}</p>
-                                        </div>
-                                    </div>
-                                    <ChevronDown
-                                        v-if="sidebarExpanded || isMobile"
-                                        class="h-4 w-4 text-gray-400"
-                                    />
-                                </button>
-                            </template>
-
-                            <template #content>
-                                <DropdownLink :href="route('profile.edit')">
-                                    <div class="flex items-center">
-                                        <User class="mr-3 h-4 w-4 text-gray-400" />
-                                        Profile
-                                    </div>
-                                </DropdownLink>
-                                <DropdownLink :href="route('logout')" method="post" as="button">
-                                    <div class="flex items-center">
-                                        <LogOut class="mr-3 h-4 w-4 text-gray-400" />
-                                        Log Out
-                                    </div>
-                                </DropdownLink>
-                            </template>
-                        </Dropdown>
+                <!-- Sidebar Footer -->
+                <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
+                    <div class="flex items-center justify-between">
+                        <button
+                            v-if="sidebarExpanded || isMobile"
+                            @click="toggleDarkMode"
+                            class="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full"
+                        >
+                            <component :is="themeIcon" class="h-4 w-4" />
+                            <span>{{ themeText }}</span>
+                        </button>
+                        <button
+                            v-else
+                            @click="toggleDarkMode"
+                            class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mx-auto"
+                            :title="themeText"
+                        >
+                            <component :is="themeIcon" class="h-4 w-4" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -438,33 +426,126 @@ const filteredNavigation = computed(() => {
                     : (sidebarExpanded ? 'ml-64' : 'ml-16')
             ]"
         >
-            <!-- Top bar -->
-            <header class="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-                <div class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                    <div class="flex items-center">
+            <!-- Top Navigation Bar -->
+            <header class="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
+                <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                    <!-- Left side -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Mobile menu button -->
                         <button
                             v-if="isMobile"
                             @click="toggleSidebar"
-                            class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 mr-4 transition-colors"
+                            class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
-                            <Menu class="h-6 w-6" />
+                            <Menu class="h-5 w-5" />
                         </button>
-                        <div>
+
+                        <!-- Page header slot -->
+                        <div class="flex-1">
                             <slot name="header" />
                         </div>
                     </div>
 
-                    <!-- Desktop user menu -->
-                    <div class="hidden lg:flex lg:items-center lg:space-x-4">
-                        <div class="text-sm text-gray-500">
-                            Welcome back, {{ $page.props.auth.user.name }}
+                    <!-- Right side - User controls -->
+                    <div class="flex items-center space-x-3">
+                        <!-- Search -->
+                        <button class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <Search class="h-5 w-5" />
+                        </button>
+
+                        <!-- Notifications -->
+                        <button class="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <Bell class="h-5 w-5" />
+                            <span class="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                        </button>
+
+                        <!-- Quick Actions -->
+                        <button class="hidden sm:inline-flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
+                            <Plus class="h-4 w-4" />
+                            <span>New Sale</span>
+                        </button>
+
+                        <!-- Theme Toggle (Desktop) -->
+                        <button
+                            @click="toggleDarkMode"
+                            class="hidden lg:flex p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            :title="themeText"
+                        >
+                            <component :is="themeIcon" class="h-5 w-5" />
+                        </button>
+
+                        <!-- User Menu -->
+                        <div class="relative">
+                            <Dropdown align="right" width="56">
+                                <template #trigger>
+                                    <button class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                        <div class="flex items-center space-x-3">
+                                            <img
+                                                class="h-8 w-8 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
+                                                :src="`https://ui-avatars.com/api/?name=${encodeURIComponent($page.props.auth.user.name)}&background=6366f1&color=fff`"
+                                                :alt="$page.props.auth.user.name"
+                                            />
+                                            <div class="hidden lg:block text-left">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {{ $page.props.auth.user.name }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ $page.props.auth.user.email }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ChevronDown class="hidden lg:block h-4 w-4 text-gray-400 dark:text-gray-500" />
+                                    </button>
+                                </template>
+
+                                <template #content>
+                                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $page.props.auth.user.name }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $page.props.auth.user.email }}
+                                        </p>
+                                    </div>
+
+                                    <DropdownLink :href="route('profile.edit')">
+                                        <div class="flex items-center">
+                                            <User class="mr-3 h-4 w-4 text-gray-400" />
+                                            Profile Settings
+                                        </div>
+                                    </DropdownLink>
+
+                                    <DropdownLink href="#" class="flex items-center">
+                                        <HelpCircle class="mr-3 h-4 w-4 text-gray-400" />
+                                        Help & Support
+                                    </DropdownLink>
+
+                                    <!-- Theme Toggle (Mobile) -->
+                                    <button
+                                        @click="toggleDarkMode"
+                                        class="lg:hidden w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center"
+                                    >
+                                        <component :is="themeIcon" class="mr-3 h-4 w-4 text-gray-400" />
+                                        {{ themeText }}
+                                    </button>
+
+                                    <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+
+                                    <DropdownLink :href="route('logout')" method="post" as="button">
+                                        <div class="flex items-center">
+                                            <LogOut class="mr-3 h-4 w-4 text-gray-400" />
+                                            Sign Out
+                                        </div>
+                                    </DropdownLink>
+                                </template>
+                            </Dropdown>
                         </div>
                     </div>
                 </div>
             </header>
 
             <!-- Page content -->
-            <main class="p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 <slot />
             </main>
         </div>
