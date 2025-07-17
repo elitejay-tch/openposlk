@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_DATABASE=openpos
+      - DB_USERNAME=openpos
+      - DB_PASSWORD=secret
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: openpos
+      POSTGRES_USER: openpos
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
