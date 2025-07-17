@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { useMenuManager } from '@/composables/useMenuManager';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import SidebarMenuItem from '@/Components/SidebarMenuItem.vue';
 import { Link } from '@inertiajs/vue3';
 import {
     LayoutDashboard,
@@ -21,12 +22,41 @@ import {
     Package,
     CreditCard,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Bell,
+    Search,
+    Shield,
+    Database,
+    TrendingUp,
+    Calendar,
+    MessageSquare,
+    Archive,
+    Truck,
+    DollarSign,
+    Receipt,
+    UserCheck,
+    Store,
+    Layers,
+    Globe
 } from 'lucide-vue-next';
+
+const page = usePage();
+const {
+    openSubmenus,
+    toggleSubmenu,
+    isSubmenuOpen,
+    closeAllSubmenus,
+    setActiveMenuItem
+} = useMenuManager();
 
 const sidebarOpen = ref(false);
 const sidebarExpanded = ref(true);
 const isMobile = ref(false);
+
+// Get app name from environment or use default
+const appName = computed(() => {
+    return page.props.appName || import.meta.env.VITE_APP_NAME || 'POS System';
+});
 
 // Check if we're on mobile
 const checkMobile = () => {
@@ -39,30 +69,237 @@ const checkMobile = () => {
 onMounted(() => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    updateActiveMenuItems();
 });
 
 onUnmounted(() => {
     window.removeEventListener('resize', checkMobile);
 });
 
-// Navigation items
-const navigation = [
-    { name: 'Dashboard', href: 'dashboard', icon: LayoutDashboard, exists: true },
-    { name: 'Sales', href: 'sales.index', icon: ShoppingCart, exists: false },
-    { name: 'Products', href: 'products.index', icon: Package, exists: false },
-    { name: 'Customers', href: 'customers.index', icon: Users, exists: false },
-    { name: 'Reports', href: 'reports.index', icon: BarChart3, exists: false },
-    { name: 'Transactions', href: 'transactions.index', icon: CreditCard, exists: false },
-    { name: 'Settings', href: 'settings.index', icon: Settings, exists: false },
-];
+// Watch for route changes to update active menu items
+watch(() => page.url, () => {
+    updateActiveMenuItems();
+});
 
-const activeNavigation = navigation.filter(item => item.exists || item.href === '#');
+// Navigation items with nested structure
+const navigation = ref([
+    {
+        id: 'dashboard',
+        name: 'Dashboard',
+        route: 'dashboard',
+        icon: LayoutDashboard,
+        exists: true,
+        active: false
+    },
+    {
+        id: 'sales',
+        name: 'Sales',
+        icon: ShoppingCart,
+        exists: true,
+        active: false,
+        children: [
+            {
+                id: 'sales-pos',
+                name: 'POS Terminal',
+                route: 'sales.pos',
+                icon: Store,
+                exists: true, // Set to true since we'll create this route
+                active: false
+            },
+            {
+                id: 'sales-orders',
+                name: 'Orders',
+                route: 'sales.orders',
+                icon: Receipt,
+                exists: true, // Set to true since we'll create this route
+                active: false,
+                badge: '12'
+            },
+            {
+                id: 'sales-invoices',
+                name: 'Invoices',
+                route: 'sales.invoices',
+                icon: FileText,
+                exists: true, // Set to true since we'll create this route
+                active: false
+            }
+        ]
+    },
+    {
+        id: 'inventory',
+        name: 'Inventory',
+        icon: Package,
+        exists: true,
+        active: false,
+        children: [
+            {
+                id: 'products',
+                name: 'Products',
+                route: 'products.index',
+                icon: Package,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'categories',
+                name: 'Categories',
+                route: 'categories.index',
+                icon: Layers,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'suppliers',
+                name: 'Suppliers',
+                route: 'suppliers.index',
+                icon: Truck,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'stock',
+                name: 'Stock Management',
+                route: 'stock.index',
+                icon: Archive,
+                exists: true,
+                active: false
+            }
+        ]
+    },
+    {
+        id: 'customers',
+        name: 'Customers',
+        icon: Users,
+        exists: true,
+        active: false,
+        children: [
+            {
+                id: 'customers-all',
+                name: 'All Customers',
+                route: 'customers.index',
+                icon: Users,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'customers-groups',
+                name: 'Customer Groups',
+                route: 'customers.groups',
+                icon: UserCheck,
+                exists: true,
+                active: false
+            }
+        ]
+    },
+    {
+        id: 'reports',
+        name: 'Reports & Analytics',
+        icon: BarChart3,
+        exists: true,
+        active: false,
+        children: [
+            {
+                id: 'reports-sales',
+                name: 'Sales Reports',
+                route: 'reports.sales',
+                icon: TrendingUp,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'reports-inventory',
+                name: 'Inventory Reports',
+                route: 'reports.inventory',
+                icon: Database,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'reports-financial',
+                name: 'Financial Reports',
+                route: 'reports.financial',
+                icon: DollarSign,
+                exists: true,
+                active: false
+            }
+        ]
+    },
+    {
+        id: 'transactions',
+        name: 'Transactions',
+        route: 'transactions.index',
+        icon: CreditCard,
+        exists: true,
+        active: false
+    },
+    {
+        id: 'settings',
+        name: 'Settings',
+        icon: Settings,
+        exists: true,
+        active: false,
+        children: [
+            {
+                id: 'settings-general',
+                name: 'General Settings',
+                route: 'settings.general',
+                icon: Settings,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'settings-users',
+                name: 'User Management',
+                route: 'settings.users',
+                icon: Shield,
+                exists: true,
+                active: false
+            },
+            {
+                id: 'settings-system',
+                name: 'System Settings',
+                route: 'settings.system',
+                icon: Globe,
+                exists: true,
+                active: false
+            }
+        ]
+    }
+]);
+
+const updateActiveMenuItems = () => {
+    const currentRoute = page.props.route || { name: '', path: '' };
+    setActiveMenuItem(navigation.value, currentRoute);
+
+    // Update isOpen state for submenus
+    navigation.value.forEach(item => {
+        if (item.children) {
+            item.isOpen = isSubmenuOpen(item.id);
+        }
+    });
+};
+
+const handleToggleSubmenu = (menuId) => {
+    toggleSubmenu(menuId);
+
+    // Update isOpen state
+    navigation.value.forEach(item => {
+        if (item.id === menuId) {
+            item.isOpen = isSubmenuOpen(menuId);
+        }
+    });
+};
 
 const toggleSidebar = () => {
     if (isMobile.value) {
         sidebarOpen.value = !sidebarOpen.value;
     } else {
         sidebarExpanded.value = !sidebarExpanded.value;
+        // Close all submenus when collapsing
+        if (!sidebarExpanded.value) {
+            closeAllSubmenus();
+            updateActiveMenuItems();
+        }
     }
 };
 
@@ -71,6 +308,11 @@ const closeSidebar = () => {
         sidebarOpen.value = false;
     }
 };
+
+// Filter navigation to show existing or placeholder items
+const filteredNavigation = computed(() => {
+    return navigation.value.filter(item => item.exists || item.children);
+});
 </script>
 
 <template>
@@ -84,7 +326,7 @@ const closeSidebar = () => {
 
         <!-- Sidebar -->
         <div
-            class="fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out"
+            class="fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-lg"
             :class="[
                 isMobile
                     ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') + ' w-64'
@@ -100,7 +342,7 @@ const closeSidebar = () => {
                             v-if="sidebarExpanded || isMobile"
                             class="text-xl font-semibold text-gray-900 whitespace-nowrap"
                         >
-                            POS System
+                            {{ appName }}
                         </span>
                     </Link>
 
@@ -108,7 +350,8 @@ const closeSidebar = () => {
                     <button
                         v-if="!isMobile"
                         @click="toggleSidebar"
-                        class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                        class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+                        :title="sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
                     >
                         <ChevronLeft v-if="sidebarExpanded" class="h-5 w-5" />
                         <ChevronRight v-else class="h-5 w-5" />
@@ -118,57 +361,25 @@ const closeSidebar = () => {
                     <button
                         v-if="isMobile"
                         @click="closeSidebar"
-                        class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                        class="p-1 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
                     >
                         <X class="h-6 w-6" />
                     </button>
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                    <template v-for="item in activeNavigation" :key="item.name">
-                        <!-- Existing routes -->
-                        <Link
-                            v-if="item.exists"
-                            :href="route(item.href)"
-                            :class="[
-                                route().current(item.href)
-                                    ? 'bg-gray-900 text-white'
-                                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-                                'group flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors'
-                            ]"
-                            @click="closeSidebar"
-                        >
-                            <component
-                                :is="item.icon"
-                                :class="[
-                                    route().current(item.href) ? 'text-white' : 'text-gray-400 group-hover:text-gray-600',
-                                    'h-5 w-5 flex-shrink-0',
-                                    (sidebarExpanded || isMobile) ? 'mr-3' : 'mx-auto'
-                                ]"
-                            />
-                            <span v-if="sidebarExpanded || isMobile">{{ item.name }}</span>
-                        </Link>
-
-                        <!-- Placeholder for future routes -->
-                        <div
-                            v-else
-                            :class="[
-                                'group flex items-center px-3 py-2.5 text-sm font-medium text-gray-400 cursor-not-allowed rounded-md',
-                                !(sidebarExpanded || isMobile) && 'justify-center'
-                            ]"
-                        >
-                            <component
-                                :is="item.icon"
-                                :class="[
-                                    'h-5 w-5 text-gray-300 flex-shrink-0',
-                                    (sidebarExpanded || isMobile) ? 'mr-3' : 'mx-auto'
-                                ]"
-                            />
-                            <span v-if="sidebarExpanded || isMobile">{{ item.name }}</span>
-                            <span v-if="sidebarExpanded || isMobile" class="ml-auto text-xs text-gray-300">(Soon)</span>
-                        </div>
-                    </template>
+                <nav class="flex-1 px-4 py-6 overflow-y-auto">
+                    <ul class="space-y-2">
+                        <SidebarMenuItem
+                            v-for="item in filteredNavigation"
+                            :key="item.id"
+                            :item="item"
+                            :is-collapsed="!sidebarExpanded"
+                            :is-mobile="isMobile"
+                            @toggle-submenu="handleToggleSubmenu"
+                            @close-sidebar="closeSidebar"
+                        />
+                    </ul>
                 </nav>
 
                 <!-- User section -->
@@ -178,7 +389,7 @@ const closeSidebar = () => {
                             <template #trigger>
                                 <button
                                     :class="[
-                                        'flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
+                                        'flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors',
                                         !(sidebarExpanded || isMobile) && 'justify-center'
                                     ]"
                                 >
@@ -191,7 +402,10 @@ const closeSidebar = () => {
                                             <p class="text-xs text-gray-500 truncate">{{ $page.props.auth.user.email }}</p>
                                         </div>
                                     </div>
-                                    <ChevronDown v-if="sidebarExpanded || isMobile" class="h-4 w-4 text-gray-400" />
+                                    <ChevronDown
+                                        v-if="sidebarExpanded || isMobile"
+                                        class="h-4 w-4 text-gray-400"
+                                    />
                                 </button>
                             </template>
 
@@ -231,7 +445,7 @@ const closeSidebar = () => {
                         <button
                             v-if="isMobile"
                             @click="toggleSidebar"
-                            class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 mr-4"
+                            class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 mr-4 transition-colors"
                         >
                             <Menu class="h-6 w-6" />
                         </button>
