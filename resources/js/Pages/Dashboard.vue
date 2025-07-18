@@ -10,7 +10,10 @@ import {
     TrendingDown,
     Activity,
     Calendar,
-    Clock
+    Clock,
+    MoreHorizontal,
+    ArrowUpRight,
+    Zap
 } from 'lucide-vue-next';
 
 const stats = [
@@ -19,28 +22,32 @@ const stats = [
         value: '$2,845',
         change: '+12%',
         changeType: 'increase',
-        icon: DollarSign
+        icon: DollarSign,
+        color: 'blue'
     },
     {
         name: 'Total Orders',
         value: '156',
         change: '+8%',
         changeType: 'increase',
-        icon: ShoppingCart
+        icon: ShoppingCart,
+        color: 'green'
     },
     {
         name: 'Active Customers',
         value: '1,284',
         change: '+3%',
         changeType: 'increase',
-        icon: Users
+        icon: Users,
+        color: 'purple'
     },
     {
         name: 'Products Sold',
         value: '2,847',
         change: '+15%',
         changeType: 'increase',
-        icon: Package
+        icon: Package,
+        color: 'orange'
     },
 ];
 
@@ -50,6 +57,23 @@ const recentTransactions = [
     { id: 3, customer: 'Mike Johnson', amount: '$67.25', time: '8 min ago', status: 'pending' },
     { id: 4, customer: 'Sarah Wilson', amount: '$89.75', time: '12 min ago', status: 'completed' },
 ];
+
+const quickActions = [
+    { name: 'New Sale', icon: DollarSign, color: 'blue' },
+    { name: 'Add Product', icon: Package, color: 'green' },
+    { name: 'View Reports', icon: Activity, color: 'purple' },
+    { name: 'Manage Inventory', icon: Zap, color: 'orange' },
+];
+
+const getColorClasses = (color) => {
+    const colors = {
+        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+        green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
+        purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
+        orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
+    };
+    return colors[color] || colors.blue;
+};
 </script>
 
 <template>
@@ -58,10 +82,15 @@ const recentTransactions = [
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
-                <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                    <Calendar class="h-4 w-4" />
-                    <span>7/17/2025</span>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Welcome back! Here's what's happening today.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg">
+                        <Calendar class="h-4 w-4" />
+                        <span>July 17, 2025</span>
+                    </div>
                 </div>
             </div>
         </template>
@@ -72,23 +101,25 @@ const recentTransactions = [
                 <div
                     v-for="stat in stats"
                     :key="stat.name"
-                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md dark:hover:shadow-lg transition-shadow"
+                    class="bg-white dark:bg-gray-800 rounded-2xl border-0 shadow-sm hover:shadow-md transition-all duration-200 p-6 group"
                 >
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <component :is="stat.icon" class="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div :class="[getColorClasses(stat.color), 'p-3 rounded-xl']">
+                                <component :is="stat.icon" class="h-6 w-6" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ stat.name }}</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ stat.value }}</p>
+                            </div>
                         </div>
-                        <div class="ml-4 flex-1">
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ stat.name }}</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
-                        </div>
-                        <div class="flex items-center">
-                            <TrendingUp v-if="stat.changeType === 'increase'" class="h-4 w-4 text-green-500 mr-1" />
-                            <TrendingDown v-else class="h-4 w-4 text-red-500 mr-1" />
+                        <div class="flex items-center space-x-1">
+                            <TrendingUp v-if="stat.changeType === 'increase'" class="h-4 w-4 text-green-500" />
+                            <TrendingDown v-else class="h-4 w-4 text-red-500" />
                             <span
                                 :class="[
-                                    stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600',
-                                    'text-sm font-medium'
+                                    stat.changeType === 'increase' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400',
+                                    'text-sm font-semibold'
                                 ]"
                             >
                                 {{ stat.change }}
@@ -102,56 +133,65 @@ const recentTransactions = [
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Recent Transactions -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-0 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
-                                <button class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium">
-                                    View all
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Recent Transactions</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Latest customer transactions</p>
+                                </div>
+                                <button class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium bg-gray-50 dark:bg-gray-700 px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                    <span>View all</span>
+                                    <ArrowUpRight class="h-4 w-4" />
                                 </button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <table class="min-w-full">
                                 <thead class="bg-gray-50 dark:bg-gray-750">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Customer
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Amount
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Time
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Status
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr v-for="transaction in recentTransactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ transaction.customer }}
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                                <tr v-for="transaction in recentTransactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    <td class="px-8 py-5 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm mr-4">
+                                                {{ transaction.customer.split(' ').map(n => n[0]).join('') }}
+                                            </div>
+                                            <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                                                {{ transaction.customer }}
+                                            </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <td class="px-8 py-5 whitespace-nowrap">
+                                        <div class="text-sm font-bold text-gray-900 dark:text-white">
                                             {{ transaction.amount }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-8 py-5 whitespace-nowrap">
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
                                             {{ transaction.time }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-8 py-5 whitespace-nowrap">
                                         <span :class="[
                                             transaction.status === 'completed'
-                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-                                            'inline-flex px-2 py-1 text-xs font-semibold rounded-full'
+                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                                            'inline-flex px-3 py-1 text-xs font-semibold rounded-full'
                                         ]">
                                             {{ transaction.status }}
                                         </span>
@@ -166,52 +206,74 @@ const recentTransactions = [
                 <!-- Right Sidebar -->
                 <div class="space-y-6">
                     <!-- Quick Actions -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center">
-                                <Activity class="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Quick Actions</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-0">
+                        <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg mr-3">
+                                        <Activity class="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Quick Actions</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Common tasks</p>
+                                    </div>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <MoreHorizontal class="h-5 w-5" />
+                                </button>
                             </div>
                         </div>
                         <div class="p-6">
-                            <div class="space-y-3">
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
-                                    New Sale
-                                </button>
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                    Add Product
-                                </button>
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                    View Reports
-                                </button>
-                                <button class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                    Manage Inventory
+                            <div class="grid grid-cols-2 gap-3">
+                                <button
+                                    v-for="action in quickActions"
+                                    :key="action.name"
+                                    class="flex flex-col items-center justify-center p-4 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 group"
+                                >
+                                    <div :class="[getColorClasses(action.color), 'p-2 rounded-lg mb-2 group-hover:scale-110 transition-transform']">
+                                        <component :is="action.icon" class="h-5 w-5" />
+                                    </div>
+                                    <span class="text-xs font-semibold">{{ action.name }}</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- System Status -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-0">
+                        <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
                             <div class="flex items-center">
-                                <Clock class="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">System Status</h3>
+                                <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg mr-3">
+                                    <Clock class="h-5 w-5 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">System Status</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">All systems operational</p>
+                                </div>
                             </div>
                         </div>
                         <div class="p-6">
                             <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Database</span>
-                                    <span class="text-sm font-medium text-green-600 dark:text-green-400">Online</span>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Database</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">Online</span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Payment Gateway</span>
-                                    <span class="text-sm font-medium text-green-600 dark:text-green-400">Active</span>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Gateway</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">Active</span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Inventory Sync</span>
-                                    <span class="text-sm font-medium text-green-600 dark:text-green-400">Updated</span>
+                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Inventory Sync</span>
+                                    </div>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">Updated</span>
                                 </div>
                             </div>
                         </div>
