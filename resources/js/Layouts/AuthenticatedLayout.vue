@@ -310,9 +310,7 @@ const mainContentClasses = computed(() => {
             <!-- Logo Header -->
             <div class="h-16 px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
                 <Link :href="route('dashboard')" class="flex items-center space-x-3 group min-w-0 flex-1">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-200 flex-shrink-0">
-                        <ApplicationLogo class="h-6 w-6 text-white" />
-                    </div>
+                    <ApplicationLogo class="h-6 w-6 text-white" />
                     <div v-if="sidebarExpanded || isMobile" class="flex flex-col min-w-0 flex-1">
                         <span class="text-lg font-bold text-gray-900 dark:text-white truncate">
                             {{ appName }}
@@ -482,43 +480,29 @@ const mainContentClasses = computed(() => {
                         </div>
                     </div>
 
-                    <!-- Right Side -->
-                    <div class="flex items-center space-x-2 flex-shrink-0">
-                        <!-- Theme Toggle -->
-                        <button
-                            @click="toggleDarkMode"
-                            class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
-                        >
-                            <component :is="isDarkMode ? Sun : Moon" class="h-5 w-5" />
-                        </button>
-
-                        <!-- Search -->
+                    <!-- Center - Search Bar -->
+                    <div class="flex-1 max-w-md mx-4 hidden md:block">
                         <div class="relative">
-                            <button
-                                @click="searchOpen = !searchOpen"
-                                class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
-                                :class="{ 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': searchOpen }"
-                            >
-                                <Search class="h-5 w-5" />
-                            </button>
-
-                            <!-- Search Dropdown -->
-                            <div
-                                v-if="searchOpen"
-                                class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 transform transition-all duration-200 origin-top-right"
-                            >
-                                <div class="p-4">
-                                    <div class="relative">
-                                        <Search class="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search..."
-                                            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                            <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
                         </div>
+                    </div>
+
+                    <!-- Right Side -->
+                    <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+                        <!-- Mobile Search Toggle -->
+                        <button
+                            v-if="isMobile"
+                            @click="searchOpen = !searchOpen"
+                            class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
+                            :class="{ 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': searchOpen }"
+                        >
+                            <Search class="h-5 w-5" />
+                        </button>
 
                         <!-- Notifications -->
                         <div class="relative">
@@ -534,7 +518,7 @@ const mainContentClasses = computed(() => {
                             <!-- Notifications Dropdown -->
                             <div
                                 v-if="notificationOpen"
-                                class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 transform transition-all duration-200 origin-top-right"
+                                class="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 transform transition-all duration-200 origin-top-right"
                             >
                                 <div class="p-4 border-b border-gray-200 dark:border-gray-700">
                                     <h3 class="font-semibold text-gray-900 dark:text-white">Notifications</h3>
@@ -545,33 +529,24 @@ const mainContentClasses = computed(() => {
                             </div>
                         </div>
 
-                        <!-- Quick Action -->
+                        <!-- Theme Toggle - Moved before user profile -->
                         <button
-                            v-if="!isMobile"
-                            class="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                            @click="toggleDarkMode"
+                            class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
                         >
-                            <Plus class="h-4 w-4" />
-                            <span class="hidden sm:inline">Quick Action</span>
-                        </button>
-
-                        <!-- Mobile Quick Action -->
-                        <button
-                            v-if="isMobile"
-                            class="p-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 flex-shrink-0"
-                        >
-                            <Plus class="h-5 w-5" />
+                            <component :is="isDarkMode ? Sun : Moon" class="h-5 w-5" />
                         </button>
 
                         <!-- User Menu -->
                         <Dropdown align="right" width="64">
                             <template #trigger>
-                                <button class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                                <button class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 min-w-0">
                                     <img
-                                        class="h-8 w-8 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
+                                        class="h-8 w-8 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 flex-shrink-0"
                                         :src="`https://ui-avatars.com/api/?name=${encodeURIComponent($page.props.auth.user.name)}&background=3b82f6&color=fff&rounded=true&size=32`"
                                         :alt="$page.props.auth.user.name"
                                     />
-                                    <div v-if="isLargeScreen" class="text-left min-w-0 max-w-[120px]">
+                                    <div v-if="isLargeScreen" class="text-left min-w-0 max-w-[120px] hidden lg:block">
                                         <p class="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
                                             {{ $page.props.auth.user.name }}
                                         </p>
@@ -579,7 +554,7 @@ const mainContentClasses = computed(() => {
                                             {{ $page.props.auth.user.email }}
                                         </p>
                                     </div>
-                                    <ChevronDown v-if="isLargeScreen" class="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                    <ChevronDown v-if="isLargeScreen" class="h-4 w-4 text-gray-400 flex-shrink-0 hidden lg:block" />
                                 </button>
                             </template>
 
@@ -625,7 +600,7 @@ const mainContentClasses = computed(() => {
                     class="px-4 pb-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-300"
                 >
                     <div class="relative">
-                        <Search class="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search..."
@@ -635,7 +610,7 @@ const mainContentClasses = computed(() => {
                 </div>
             </header>
 
-            <!-- Page Content -->
+<!--             Page Content-->
             <main class="p-4 sm:p-6 lg:p-8 max-w-full overflow-x-hidden">
                 <slot />
             </main>
