@@ -1,20 +1,20 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { usePage } from '@inertiajs/vue3';
-import { useDarkMode } from '@/composables/useDarkMode';
+import {ref, computed, onMounted, onUnmounted} from 'vue';
+import {usePage} from '@inertiajs/vue3';
+import {useDarkMode} from '@/composables/useDarkMode';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {Link} from '@inertiajs/vue3';
 import {
     LayoutDashboard, Users, Settings, FileText, ShoppingCart, BarChart3,
     Menu, X, ChevronDown, LogOut, User, Package, CreditCard, Bell, Search,
     TrendingUp, Receipt, Store, ChevronRight, ChevronLeft, Plus, HelpCircle,
-    Moon, Sun
+    Moon, Sun, Calendar
 } from 'lucide-vue-next';
 
 const page = usePage();
-const { isDarkMode, toggleDarkMode } = useDarkMode();
+const {isDarkMode, toggleDarkMode} = useDarkMode();
 
 // Responsive state
 const sidebarOpen = ref(false);
@@ -294,6 +294,21 @@ const mainContentClasses = computed(() => {
 
     return `${baseClasses} ${hasActiveSubmenu ? 'ml-[22rem]' : 'ml-72'}`;
 });
+
+// import { ref, onMounted, onUnmounted } from 'vue';
+
+const currentTime = ref(new Date().toLocaleString());
+
+let timeInterval;
+onMounted(() => {
+    timeInterval = setInterval(() => {
+        currentTime.value = new Date().toLocaleString();
+    }, 1000);
+});
+
+onUnmounted(() => {
+    clearInterval(timeInterval);
+});
 </script>
 
 <template>
@@ -308,9 +323,10 @@ const mainContentClasses = computed(() => {
         <!-- Main Sidebar -->
         <aside :class="sidebarClasses">
             <!-- Logo Header -->
-            <div class="h-16 px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
+            <div
+                class="h-16 px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
                 <Link :href="route('dashboard')" class="flex items-center space-x-3 group min-w-0 flex-1">
-                    <ApplicationLogo class="h-6 w-6 text-white" />
+                    <ApplicationLogo class="h-6 w-6 text-white"/>
                     <div v-if="sidebarExpanded || isMobile" class="flex flex-col min-w-0 flex-1">
                         <span class="text-lg font-bold text-gray-900 dark:text-white truncate">
                             {{ appName }}
@@ -326,13 +342,14 @@ const mainContentClasses = computed(() => {
                     @click="toggleSidebar"
                     class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 flex-shrink-0"
                 >
-                    <ChevronLeft v-if="sidebarExpanded" class="h-4 w-4" />
-                    <ChevronRight v-else class="h-4 w-4" />
+                    <ChevronLeft v-if="sidebarExpanded" class="h-4 w-4"/>
+                    <ChevronRight v-else class="h-4 w-4"/>
                 </button>
             </div>
 
             <!-- Navigation Menu -->
-            <nav class="flex-1 p-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+            <nav
+                class="flex-1 p-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                 <div class="space-y-1">
                     <template v-for="item in navigation" :key="item.id">
                         <!-- Simple Navigation Item -->
@@ -342,7 +359,7 @@ const mainContentClasses = computed(() => {
                             :class="getNavItemClasses(item.color, item.active)"
                             @click="closeAllDropdowns"
                         >
-                            <component :is="item.icon" class="h-5 w-5 flex-shrink-0" />
+                            <component :is="item.icon" class="h-5 w-5 flex-shrink-0"/>
                             <span v-if="sidebarExpanded || isMobile" class="ml-3 truncate">
                                 {{ item.name }}
                             </span>
@@ -354,7 +371,7 @@ const mainContentClasses = computed(() => {
                                 :class="getNavItemClasses(item.color, activeSubmenu === item.id)"
                                 @click="toggleSubmenu(item.id)"
                             >
-                                <component :is="item.icon" class="h-5 w-5 flex-shrink-0" />
+                                <component :is="item.icon" class="h-5 w-5 flex-shrink-0"/>
                                 <span v-if="sidebarExpanded || isMobile" class="ml-3 flex-1 text-left truncate">
                                     {{ item.name }}
                                 </span>
@@ -377,7 +394,8 @@ const mainContentClasses = computed(() => {
                                     class="flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
                                     @click="closeAllDropdowns"
                                 >
-                                    <component :is="child.icon" class="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                    <component :is="child.icon"
+                                               class="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0"/>
                                     <span class="ml-3 truncate">{{ child.name }}</span>
                                     <span
                                         v-if="child.badge"
@@ -400,10 +418,13 @@ const mainContentClasses = computed(() => {
                 class="h-full flex flex-col"
             >
                 <!-- Submenu Header -->
-                <div class="h-16 px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
+                <div
+                    class="h-16 px-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
                     <div class="flex items-center space-x-3 min-w-0 flex-1">
-                        <div class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <component :is="navigation.find(item => item.id === activeSubmenu)?.icon" class="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                        <div
+                            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <component :is="navigation.find(item => item.id === activeSubmenu)?.icon"
+                                       class="h-4 w-4 text-gray-600 dark:text-gray-400"/>
                         </div>
                         <div class="min-w-0 flex-1">
                             <h3 class="font-semibold text-gray-900 dark:text-white text-sm truncate">
@@ -418,12 +439,13 @@ const mainContentClasses = computed(() => {
                         @click="activeSubmenu = null"
                         class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
                     >
-                        <X class="h-4 w-4" />
+                        <X class="h-4 w-4"/>
                     </button>
                 </div>
 
                 <!-- Submenu Content -->
-                <nav class="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                <nav
+                    class="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                     <div class="space-y-2">
                         <Link
                             v-for="child in navigation.find(item => item.id === activeSubmenu)?.children || []"
@@ -431,8 +453,9 @@ const mainContentClasses = computed(() => {
                             :href="safeRoute(child.route)"
                             class="group flex items-start p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 border border-transparent hover:border-gray-200 dark:hover:border-gray-600"
                         >
-                            <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-white dark:group-hover:bg-gray-600 transition-colors duration-200 flex-shrink-0">
-                                <component :is="child.icon" class="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                            <div
+                                class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-white dark:group-hover:bg-gray-600 transition-colors duration-200 flex-shrink-0">
+                                <component :is="child.icon" class="h-5 w-5 text-gray-600 dark:text-gray-300"/>
                             </div>
                             <div class="ml-4 flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
@@ -459,7 +482,8 @@ const mainContentClasses = computed(() => {
         <!-- Main Content -->
         <div :class="mainContentClasses">
             <!-- Top Header -->
-            <header class="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700">
+            <header
+                class="sticky top-0 z-30 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between h-16 px-4 lg:px-6">
                     <!-- Left Side -->
                     <div class="flex items-center space-x-3 flex-1 min-w-0">
@@ -468,22 +492,33 @@ const mainContentClasses = computed(() => {
                             @click="toggleSidebar"
                             class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
                         >
-                            <Menu class="h-5 w-5" />
+                            <Menu class="h-5 w-5"/>
                         </button>
 
+
                         <div class="flex-1 min-w-0">
-                            <slot name="header">
-                                <h1 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                                    Dashboard
-                                </h1>
-                            </slot>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                                        {{ page.props.title || 'Dashboard' }}</h1>
+                                    <p v-if="!isMobile" class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ page.props.subtitle || "Welcome back! Here's what's happening today." }}</p>
+                                </div>
+                                <div
+                                    class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg">
+                                    <Calendar class="h-4 w-4"/>
+                                    <span>{{ currentTime }}</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
                     <!-- Center - Search Bar -->
                     <div class="flex-1 max-w-md mx-4 hidden md:block">
                         <div class="relative">
-                            <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
                             <input
                                 type="text"
                                 placeholder="Search..."
@@ -501,7 +536,7 @@ const mainContentClasses = computed(() => {
                             class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
                             :class="{ 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': searchOpen }"
                         >
-                            <Search class="h-5 w-5" />
+                            <Search class="h-5 w-5"/>
                         </button>
 
                         <!-- Notifications -->
@@ -511,8 +546,9 @@ const mainContentClasses = computed(() => {
                                 class="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
                                 :class="{ 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': notificationOpen }"
                             >
-                                <Bell class="h-5 w-5" />
-                                <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
+                                <Bell class="h-5 w-5"/>
+                                <span
+                                    class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
                             </button>
 
                             <!-- Notifications Dropdown -->
@@ -534,13 +570,14 @@ const mainContentClasses = computed(() => {
                             @click="toggleDarkMode"
                             class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0"
                         >
-                            <component :is="isDarkMode ? Sun : Moon" class="h-5 w-5" />
+                            <component :is="isDarkMode ? Sun : Moon" class="h-5 w-5"/>
                         </button>
 
                         <!-- User Menu -->
                         <Dropdown align="right" width="64">
                             <template #trigger>
-                                <button class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 min-w-0">
+                                <button
+                                    class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 min-w-0">
                                     <img
                                         class="h-8 w-8 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 flex-shrink-0"
                                         :src="`https://ui-avatars.com/api/?name=${encodeURIComponent($page.props.auth.user.name)}&background=3b82f6&color=fff&rounded=true&size=32`"
@@ -554,7 +591,8 @@ const mainContentClasses = computed(() => {
                                             {{ $page.props.auth.user.email }}
                                         </p>
                                     </div>
-                                    <ChevronDown v-if="isLargeScreen" class="h-4 w-4 text-gray-400 flex-shrink-0 hidden lg:block" />
+                                    <ChevronDown v-if="isLargeScreen"
+                                                 class="h-4 w-4 text-gray-400 flex-shrink-0 hidden lg:block"/>
                                 </button>
                             </template>
 
@@ -568,13 +606,15 @@ const mainContentClasses = computed(() => {
                                     </p>
                                 </div>
 
-                                <DropdownLink :href="route('profile.edit')" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <User class="mr-3 h-4 w-4 text-gray-400" />
+                                <DropdownLink :href="route('profile.edit')"
+                                              class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <User class="mr-3 h-4 w-4 text-gray-400"/>
                                     <span>Profile Settings</span>
                                 </DropdownLink>
 
-                                <DropdownLink href="#" class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <HelpCircle class="mr-3 h-4 w-4 text-gray-400" />
+                                <DropdownLink href="#"
+                                              class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <HelpCircle class="mr-3 h-4 w-4 text-gray-400"/>
                                     <span>Help & Support</span>
                                 </DropdownLink>
 
@@ -586,7 +626,7 @@ const mainContentClasses = computed(() => {
                                     as="button"
                                     class="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                                 >
-                                    <LogOut class="mr-3 h-4 w-4 text-red-500" />
+                                    <LogOut class="mr-3 h-4 w-4 text-red-500"/>
                                     <span>Sign Out</span>
                                 </DropdownLink>
                             </template>
@@ -600,7 +640,7 @@ const mainContentClasses = computed(() => {
                     class="px-4 pb-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-300"
                 >
                     <div class="relative">
-                        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
                         <input
                             type="text"
                             placeholder="Search..."
@@ -610,9 +650,9 @@ const mainContentClasses = computed(() => {
                 </div>
             </header>
 
-<!--             Page Content-->
+            <!--             Page Content-->
             <main class="p-4 sm:p-6 lg:p-8 max-w-full overflow-x-hidden">
-                <slot />
+                <slot/>
             </main>
         </div>
     </div>

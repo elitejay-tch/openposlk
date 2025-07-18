@@ -86,12 +86,7 @@ const getColorClasses = (color) => {
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Welcome back! Here's what's happening today.</p>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg">
-                        <Calendar class="h-4 w-4" />
-                        <span>July 17, 2025</span>
-                    </div>
-                </div>
+
             </div>
         </template>
 
