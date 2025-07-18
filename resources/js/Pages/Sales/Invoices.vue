@@ -3,121 +3,125 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import {
-    Package,
+    FileText,
+    Plus,
     Search,
     Filter,
     Download,
     Eye,
     Edit,
     Trash2,
+    Send,
+    Printer,
+    DollarSign,
+    Calendar,
     Clock,
     CheckCircle,
     XCircle,
-    AlertCircle,
-    Calendar,
-    DollarSign,
-    User
+    AlertCircle
 } from 'lucide-vue-next';
 
-const orders = ref([
+const invoices = ref([
     {
-        id: 'ORD-001',
+        id: 'INV-001',
         customer: 'John Doe',
         date: '2025-07-17',
-        time: '14:30',
-        amount: 156.50,
-        status: 'completed',
-        items: 3,
-        paymentMethod: 'Card'
-    },
-    {
-        id: 'ORD-002',
-        customer: 'Jane Smith',
-        date: '2025-07-17',
-        time: '13:45',
-        amount: 89.99,
-        status: 'pending',
-        items: 2,
-        paymentMethod: 'Cash'
-    },
-    {
-        id: 'ORD-003',
-        customer: 'Mike Johnson',
-        date: '2025-07-17',
-        time: '12:15',
-        amount: 234.75,
-        status: 'processing',
+        dueDate: '2025-08-16',
+        amount: 1250.50,
+        status: 'paid',
         items: 5,
         paymentMethod: 'Card'
     },
     {
-        id: 'ORD-004',
-        customer: 'Sarah Wilson',
+        id: 'INV-002',
+        customer: 'Jane Smith',
         date: '2025-07-16',
-        time: '16:20',
-        amount: 67.30,
-        status: 'cancelled',
-        items: 1,
+        dueDate: '2025-08-15',
+        amount: 890.25,
+        status: 'pending',
+        items: 3,
+        paymentMethod: 'Bank Transfer'
+    },
+    {
+        id: 'INV-003',
+        customer: 'Mike Johnson',
+        date: '2025-07-15',
+        dueDate: '2025-08-14',
+        amount: 2150.75,
+        status: 'sent',
+        items: 8,
+        paymentMethod: 'Check'
+    },
+    {
+        id: 'INV-004',
+        customer: 'Sarah Wilson',
+        date: '2025-07-14',
+        dueDate: '2025-08-13',
+        amount: 340.00,
+        status: 'overdue',
+        items: 2,
         paymentMethod: 'Cash'
     },
     {
-        id: 'ORD-005',
+        id: 'INV-005',
         customer: 'David Brown',
-        date: '2025-07-16',
-        time: '15:10',
-        amount: 189.45,
-        status: 'completed',
-        items: 4,
+        date: '2025-07-13',
+        dueDate: '2025-08-12',
+        amount: 3250.80,
+        status: 'paid',
+        items: 12,
         paymentMethod: 'Card'
     }
 ]);
 
 const stats = ref([
-    { name: 'Total Orders', value: '1,247', change: '+12%', color: 'blue' },
-    { name: 'Pending Orders', value: '23', change: '+5%', color: 'orange' },
-    { name: 'Completed Today', value: '45', change: '+18%', color: 'green' },
-    { name: 'Average Order', value: '$87.50', change: '+3%', color: 'purple' }
+    { name: 'Total Invoices', value: '347', change: '+8%', color: 'blue' },
+    { name: 'Paid Invoices', value: '289', change: '+12%', color: 'green' },
+    { name: 'Pending Payment', value: '45', change: '+3%', color: 'orange' },
+    { name: 'Overdue', value: '13', change: '-5%', color: 'red' }
 ]);
 
 const getStatusColor = (status) => {
     const colors = {
-        completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+        paid: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
         pending: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-        processing: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+        sent: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+        overdue: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+        draft: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
     };
     return colors[status] || colors.pending;
 };
 
 const getStatusIcon = (status) => {
     const icons = {
-        completed: CheckCircle,
+        paid: CheckCircle,
         pending: Clock,
-        processing: AlertCircle,
-        cancelled: XCircle
+        sent: Send,
+        overdue: AlertCircle,
+        draft: FileText
     };
     return icons[status] || Clock;
 };
 </script>
 
 <template>
-    <Head title="Orders" />
+    <Head title="Invoices" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Orders</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage and track all customer orders</p>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Invoices</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage billing and invoice processing</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <button class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        <Filter class="h-4 w-4" />
-                        <span>Filter</span>
-                    </button>
-                    <button class="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors">
                         <Download class="h-4 w-4" />
                         <span>Export</span>
+                    </button>
+                    <button class="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors">
+                        <Plus class="h-4 w-4" />
+                        <span>Create Invoice</span>
                     </button>
                 </div>
             </div>
@@ -143,23 +147,27 @@ const getStatusIcon = (status) => {
                 </div>
             </div>
 
-            <!-- Orders Table -->
+            <!-- Invoices Table -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-0 overflow-hidden">
                 <div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Recent Orders</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ orders.length }} orders found</p>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Invoice Management</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ invoices.length }} invoices found</p>
                         </div>
                         <div class="flex items-center space-x-4">
                             <div class="relative">
                                 <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Search orders..."
+                                    placeholder="Search invoices..."
                                     class="pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm w-64"
                                 />
                             </div>
+                            <button class="flex items-center space-x-2 bg<button class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                            <Filter class="h-4 w-4" />
+                            <span>Filter</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -168,19 +176,19 @@ const getStatusIcon = (status) => {
                         <thead class="bg-gray-50 dark:bg-gray-750">
                         <tr>
                             <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Order ID
+                                Invoice ID
                             </th>
                             <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Customer
                             </th>
                             <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Date & Time
+                                Date
+                            </th>
+                            <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Due Date
                             </th>
                             <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Amount
-                            </th>
-                            <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Items
                             </th>
                             <th class="px-8 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Status
@@ -191,41 +199,50 @@ const getStatusIcon = (status) => {
                         </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
-                        <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <tr v-for="invoice in invoices" :key="invoice.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                             <td class="px-8 py-5 whitespace-nowrap">
                                 <div class="text-sm font-bold text-gray-900 dark:text-white">
-                                    {{ order.id }}
+                                    {{ invoice.id }}
+                                </div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ invoice.items }} items
                                 </div>
                             </td>
                             <td class="px-8 py-5 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm mr-3">
-                                        {{ order.customer.split(' ').map(n => n[0]).join('') }}
+                                        {{ invoice.customer.split(' ').map(n => n[0]).join('') }}
                                     </div>
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">
-                                        {{ order.customer }}
+                                        {{ invoice.customer }}
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-5 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">{{ order.date }}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ order.time }}</div>
-                            </td>
-                            <td class="px-8 py-5 whitespace-nowrap">
-                                <div class="text-sm font-bold text-gray-900 dark:text-white">
-                                    ${{ order.amount }}
-                                </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ order.paymentMethod }}</div>
-                            </td>
-                            <td class="px-8 py-5 whitespace-nowrap">
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white">
-                                    {{ order.items }} items
+                                <div class="flex items-center space-x-2">
+                                    <Calendar class="h-4 w-4 text-gray-400" />
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ invoice.date }}</span>
                                 </div>
                             </td>
                             <td class="px-8 py-5 whitespace-nowrap">
-                                    <span :class="[getStatusColor(order.status), 'inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full']">
-                                        <component :is="getStatusIcon(order.status)" class="h-3 w-3 mr-1" />
-                                        {{ order.status }}
+                                <div class="flex items-center space-x-2">
+                                    <Clock class="h-4 w-4 text-gray-400" />
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ invoice.dueDate }}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 whitespace-nowrap">
+                                <div class="flex items-center space-x-2">
+                                    <DollarSign class="h-4 w-4 text-gray-400" />
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">${{ invoice.amount.toFixed(2) }}</span>
+                                </div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ invoice.paymentMethod }}
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 whitespace-nowrap">
+                                    <span :class="[getStatusColor(invoice.status), 'inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full capitalize']">
+                                        <component :is="getStatusIcon(invoice.status)" class="h-3 w-3 mr-1" />
+                                        {{ invoice.status }}
                                     </span>
                             </td>
                             <td class="px-8 py-5 whitespace-nowrap text-sm font-medium">
@@ -236,8 +253,11 @@ const getStatusIcon = (status) => {
                                     <button class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
                                         <Edit class="h-4 w-4" />
                                     </button>
-                                    <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                        <Trash2 class="h-4 w-4" />
+                                    <button class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                        <Printer class="h-4 w-4" />
+                                    </button>
+                                    <button class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
+                                        <Send class="h-4 w-4" />
                                     </button>
                                 </div>
                             </td>
